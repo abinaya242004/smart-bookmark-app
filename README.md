@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Smart Bookmark App
 
-## Getting Started
+A modern bookmark manager built with Next.js, Supabase, and custom CSS.
 
-First, run the development server:
+## Features
+- ✅ Google OAuth authentication
+- ✅ Add bookmarks with title and URL
+- ✅ Private bookmarks per user (RLS policies)
+- ✅ Real-time updates across tabs
+- ✅ Delete bookmarks
+- ✅ Modern, responsive UI with animations
+
+## 🛠️ Problems Faced & Solutions
+
+### 1. Duplicate Key Error (409 Conflict)
+**Problem:** Getting "duplicate key violates unique constraint" when adding bookmarks
+**Solution:** Realized UUID wasn't auto-generating. Fixed by ensuring database uses `gen_random_uuid()` as default for id column.
+
+### 2. RLS Policy Issues
+**Problem:** Users could see all bookmarks or none at all
+**Solution:** Implemented proper policies with `auth.uid() = user_id` for SELECT, INSERT, and DELETE operations.
+
+### 3. Real-time Updates Not Working
+**Problem:** Bookmarks wouldn't update across different browser tabs
+**Solution:** Added Supabase real-time subscription with proper channel configuration and cleanup in useEffect.
+
+### 4. URL Formatting Errors
+**Problem:** Bookmarks without https:// wouldn't open correctly
+**Solution:** Added automatic https:// prefix if no protocol specified.
+
+### 5. Vercel Deployment Failures
+**Problem:** Build failing with "supabaseUrl is required"
+**Solution:** Added environment variables `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Vercel dashboard.
+
+### 6. 400 Bad Request Error
+**Problem:** `column bookmarks.created_at does not exist`
+**Solution:** Added created_at column to database or removed order by clause.
+
+## 🚀 Live Demo
+[https://smart-bookmark-app1-cyan.vercel.app](https://smart-bookmark-app1-cyan.vercel.app)
+
+## 💻 Tech Stack
+- Next.js 14 (App Router)
+- Supabase (Auth, Database, Realtime)
+- Custom CSS with modern design
+- Deployed on Vercel
+
+## 📦 Local Setup
 
 ```bash
+# Clone repository
+git clone https://github.com/abinaya242004/smart-bookmark-app.git
+
+# Navigate to project
+cd smart-bookmark-app
+
+# Install dependencies
+npm install
+
+# Create .env.local file
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
