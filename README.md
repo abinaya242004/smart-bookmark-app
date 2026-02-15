@@ -63,3 +63,31 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 # Run development server
 npm run dev
+
+
+
+## 📁 Database Schema
+
+```sql
+CREATE TABLE bookmarks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  url TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Enable RLS and create policies
+ALTER TABLE bookmarks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own bookmarks" 
+  ON bookmarks FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own bookmarks" 
+  ON bookmarks FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own bookmarks" 
+  ON bookmarks FOR DELETE USING (auth.uid() = user_id);
+
+-- Enable realtime
+ALTER PUBLICATION supabase_realtime ADD TABLE bookmarks;
